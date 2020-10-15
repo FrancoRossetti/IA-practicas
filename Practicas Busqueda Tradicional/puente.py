@@ -21,6 +21,7 @@ tiempos = [10,30,60,80,120]
 #El estado lo represento como una tupla con -> 
         #tupla[0] = todas las personas y el lado en que se encuentran (0 = izq / 1 = der)
         #tupla[1] = lado en el que se encuentra la linterna
+        #tupla[2] = tiempo transcurrido en segundos
 
 INITIAL_STATE = ((0,0,0,0,0),0,0)
 
@@ -84,10 +85,10 @@ class puenteProblem(SearchProblem):
 
 metodos = (
     #astar,
-    #breadth_first,
+    breadth_first,
     #depth_first,
     #iterative_limited_depth_first,
-    uniform_cost,
+    #uniform_cost,
 )
 
 for metodo_busqueda in metodos:
