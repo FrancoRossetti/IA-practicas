@@ -9,10 +9,8 @@ from simpleai.search import (
     depth_first,
     iterative_limited_depth_first,
     uniform_cost,
+    astar,
 )
-
-
-
 
 from simpleai.search.viewers import WebViewer, BaseViewer
 
@@ -60,7 +58,6 @@ class RatabotsProblem(SearchProblem):
         )
 
         for movimiento in movimientos:
-            morfis = state[1]
             fila_ratabot, columna_ratabot = ratabot
             cambio_fila, cambio_columna = movimiento
             nueva_posicion = (
@@ -72,28 +69,34 @@ class RatabotsProblem(SearchProblem):
                 and  (0 <= nueva_posicion[0] <= 5)
                 and  (0 <= nueva_posicion[1] <= 5)
             )
-            
-            if puedo:           
-                if (nueva_posicion in morfis):
-                    #si la nueva posicion esta en morfis, entonces saca del estado a la comida de esa posicion
-                    morfis = list(morfis)     
-                    morfis.pop(morfis.index(nueva_posicion))
-                    morfis = tuple(morfis)
-                        
-                acciones_posibles.append((nueva_posicion,morfis))
+            if puedo:         
+                acciones_posibles.append((nueva_posicion))
 
         return acciones_posibles  
 
     def result(self, state, action):
-        nueva_posicion,morfis=action
+        nueva_posicion=action
         state = list(state)
+        ratabot, morfis = state
         state[0]=nueva_posicion
-        state[1]=morfis
 
+        if (nueva_posicion in morfis):
+            #si la nueva posicion esta en morfis, entonces saca del estado a la comida de esa posicion
+            morfis = list(morfis)     
+            morfis.pop(morfis.index(nueva_posicion))
+            morfis = tuple(morfis)
+            
+        state[1]=morfis            
         return tuple(state)
 
+    def heuristic(self,state):
+        ratabot, morfis = state
+        return len(morfis)
+
+
 metodos = (
-    breadth_first,
+    astar,
+    #breadth_first,
     #depth_first,
     #iterative_limited_depth_first,
     #uniform_cost,
