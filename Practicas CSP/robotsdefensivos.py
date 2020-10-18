@@ -92,11 +92,11 @@ def in_doors(variables,values):
             c+=1
     return c == 2
 
-# vemos si en la combinacion de todos los robots están en las puertas
-for robot_x1,robot_x2,robot_x3,robot_x4,robot_x5,robot_x6 in combinations(variables, 6):
-    constraints.append(
-        ((robot_x1, robot_x2, robot_x3, robot_x4, robot_x5, robot_x6), in_doors)
-    )
+
+#GLOBAL
+constraints.append(
+    (('1', '2', '3', '4', '5', '6'), in_doors)
+)
 
 print(variables)
 print(domains)
