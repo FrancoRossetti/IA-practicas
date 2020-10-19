@@ -28,13 +28,9 @@ POSICION_RACKS = (
 )
 
 
-CAJAS = {
-    'C1':[0,3],
-    'C2':[6,1],
-}
 #Primer valor: posicion del robot
-#Segundo valor: cajas cargadas en el momento
-#Tercer valor: cajas restantes por acomodar
+#Segundo valor: cajas cargadas en el robot
+#Tercer valor: cajas no cargadas y restantes por acomodar
 
 INITIAL_STATE = ((3,5),(),((0,3),(6,1),(2,5)))
 GOAL_STATE = ((3,5),(),())
@@ -49,14 +45,9 @@ class AmagonProblem(SearchProblem):
         
         
         #Pregunto primero si esta en la entrada y tiene que cargar
-        if (robot == (3,5)): #si esta en la entrada 
-            if (len(cajas_cargadas) < 2) and (len(cajas_restantes) > 0):  #si tengo menos de 2 cajas cargadas, y me quedan cajas por cargar
-                if (len(cajas_restantes) >= 2): #si tengo 2 o mas cajas por cargar
-                    var = abs(2 - len(cajas_cargadas))   #2-1 = 1 - 1
-                    cargar = cajas_restantes[:var]
-                else:
-                    cargar = cajas_restantes[:0]
-                acciones_disponibles.append(('CARGAR',cargar))
+        if (robot == (3,5) and len(cajas_cargadas) < 2): #si esta en la entrada 
+            for caja in cajas_restantes:
+                acciones_disponibles.append(('CARGAR',caja)) #(('CARGAR',3,4)) != (('CARGAR',2,5))
            
         
         #Por ultimo agrego en las acciones los movimientos que puede hacer
@@ -66,6 +57,7 @@ class AmagonProblem(SearchProblem):
             (1,0),
             (-1,0),
         )
+        
         robot_x,robot_y = robot
         for m in movimientos:
             nueva_posicion = (
@@ -85,42 +77,35 @@ class AmagonProblem(SearchProblem):
 
     
     def is_goal(self,state):
-        return INITIAL_STATE == GOAL_STATE
+        pos_robot, cajas_cargadas, cajas_restantes = state
+        return pos_robot == (3,5) and len(cajas_restantes) == 0 and len(cajas_cargadas) == 0
     
     def result(self,state,action):
         state = list(state)
         robot, cajas_cargadas, cajas_restantes = state
-        
         accion, x = action
         if accion == "MOVER":
-            state[0] = x
-            #Después veo si esta en alguna posicion de RACK que le convenga descargar
+            state[0] = x          
             for pos in POSICION_RACKS:
                 if (state[0] in pos and state[0] in cajas_cargadas): 
                     cajas_cargadas = list(cajas_cargadas)
                     cajas_cargadas.remove(x)
                     state[1] = tuple(cajas_cargadas)
                     break
-            
-        
-        if accion == "CARGAR":
+            state[1] = tuple(cajas_cargadas)
+        else:    
+            #quiere decir que CARGA una caja
+            caja = x
             cajas_cargadas = list(cajas_cargadas)
             cajas_restantes = list(cajas_restantes)
-            cajas_cargadas.extend(x)
+            cajas_cargadas.append(x)
             cajas_cargadas = tuple(cajas_cargadas)
             state[1] = cajas_cargadas
-            for cajinis in x:
-                cajas_restantes.remove(cajinis)
-            
+            cajas_restantes.remove(x)
             state[2] = tuple(cajas_restantes)
-        
-        
-        print('ACCION:  ', action)
-        print('ESTADO:  ', state)
+
         return tuple(state)
         
-
-
 
 
 metodos = (
@@ -130,9 +115,6 @@ metodos = (
     #iterative_limited_depth_first,
     #uniform_cost,
 )
-
-
-
 
 
 for metodo_busqueda in metodos:
