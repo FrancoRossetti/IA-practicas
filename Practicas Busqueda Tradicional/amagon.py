@@ -78,7 +78,7 @@ class AmagonProblem(SearchProblem):
     
     def is_goal(self,state):
         pos_robot, cajas_cargadas, cajas_restantes = state
-        return pos_robot == (3,5) and len(cajas_restantes) == 0 and len(cajas_cargadas) == 0
+        return state == GOAL_STATE
     
     def result(self,state,action):
         state = list(state)
